@@ -27,6 +27,11 @@ Vector2 LabyrinthSquare::get_neighbour_coordinate(const direction dir) const
     return coordinate;
 }
 
+bool LabyrinthSquare::operator==(const LabyrinthSquare& end) const
+{
+    return coordinate_.x == end.coordinate_.x && coordinate_.y == end.coordinate_.y;
+}
+
 float LabyrinthSquare::get_x() const
 {
     return coordinate_.x;

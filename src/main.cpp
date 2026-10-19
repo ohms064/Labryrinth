@@ -20,6 +20,7 @@ int main()
     auto offset = Vector2( 250, 10);
 
     LabyrinthGrid labyrinth_grid = LabyrinthGrid(8);
+    labyrinth_grid.create_labyrinth(true);
 
     while (!WindowShouldClose())
     {
@@ -28,6 +29,11 @@ int main()
             ClearBackground(SKYBLUE);
         
             labyrinth_grid.draw_labyrinth(80, offset);
+        
+            if (IsKeyPressed(KEY_R))
+            {
+                labyrinth_grid.create_labyrinth(true);
+            }
                 
             DrawText("Funciona!", PositionX, PositionY, 30, BLACK);
             

@@ -10,6 +10,9 @@ public:
     explicit LabyrinthSquare(Vector2 coordinate);
     
     Vector2 get_neighbour_coordinate(direction dir) const;
+    bool operator==(const LabyrinthSquare& end) const;
+
+    bool obstacle = false;
     
     float get_x() const;
     float get_y() const;
