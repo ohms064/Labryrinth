@@ -4,6 +4,8 @@
 #include <raylib.h>
 #include <vector>
 
+#include "LabyrinthGrid.h"
+
 int main()
 {
     constexpr int screen_width = 1280;
@@ -15,20 +17,17 @@ int main()
     int PositionX = 20;
     int PositionY = 20;
     
-    int frame_count = 0;
-    
-    
-    Camera2D camera = { 0 };
-    camera.rotation = 0.0f;
-    camera.offset = Vector2 { screen_width/2.0f, screen_height/2.0f };
-    camera.zoom = 1.0f;
+    auto offset = Vector2( 250, 10);
 
+    LabyrinthGrid labyrinth_grid = LabyrinthGrid(8);
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
 
             ClearBackground(SKYBLUE);
+        
+            labyrinth_grid.draw_labyrinth(80, offset);
                 
             DrawText("Funciona!", PositionX, PositionY, 30, BLACK);
             

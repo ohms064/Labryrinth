@@ -17,6 +17,10 @@ FetchContent_MakeAvailable(raylib)
 
 add_executable(Laberinth
         src/main.cpp
+        src/LabyrinthGrid.h
+        src/LabyrinthGrid.cpp
+        src/LabyrinthSquare.h
+        src/LabyrinthSquare.cpp
 )
 
 target_link_libraries(Laberinth PRIVATE raylib)

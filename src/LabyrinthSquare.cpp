@@ -1,0 +1,38 @@
+#include "LabyrinthSquare.h"
+
+LabyrinthSquare::LabyrinthSquare(const Vector2 coordinate)
+{
+    coordinate_ = coordinate;
+}
+
+Vector2 LabyrinthSquare::get_neighbour_coordinate(const direction dir) const
+{
+    auto coordinate = coordinate_;
+    switch (dir)
+    {
+    case direction::up:
+        coordinate.y++;
+        break;
+    case direction::down:
+        coordinate.y--;
+        break;
+    case direction::left:
+        coordinate.x--;
+        break;
+    case direction::right:
+        coordinate.x++;
+        break;
+    }
+    
+    return coordinate;
+}
+
+float LabyrinthSquare::get_x() const
+{
+    return coordinate_.x;
+}
+
+float LabyrinthSquare::get_y() const
+{
+    return coordinate_.y;
+}
