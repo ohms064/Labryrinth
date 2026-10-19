@@ -7,10 +7,9 @@
 
 #include "raymath.h"
 
-LabyrinthGrid::LabyrinthGrid(int size): size_(size),
-      start_(Vector2{ 0, 0 }),
-      exit_(Vector2{ 0, 0 })
+LabyrinthGrid::LabyrinthGrid(int size) : size_(size)
 {
+    squares_.reserve(static_cast<size_t>(size) * size);
     for (int x = 0; x < size; x++)
     {
         for (int y = 0; y < size; y++)
@@ -35,27 +34,34 @@ bool LabyrinthGrid::get_neighbour_square(LabyrinthSquare square, direction dir, 
         result_square = square;
         return false;
     }
-    
+
     result_square = get_square(coordinate);
     return true;
 }
 
-void LabyrinthGrid::draw_labyrinth(int square_size_, Vector2 offset) const
+void LabyrinthGrid::draw_labyrinth(const int square_size, const Vector2 offset)
 {
-    for (const auto& square : squares_)
+    for (auto& square : squares_)
     {
         const int mod_y = std::fmod(square.get_y(), 2.f);
-        DrawRectangle(offset.x + (square_size_ * square.get_x()), offset.y + (square_size_ * square.get_y()),
-            square_size_, square_size_, square.obstacle ? BLACK : std::fmod(square.get_x() + mod_y, 2) == 0 ? GRAY : WHITE);
+        square.screen_position = Vector2(offset.x + (square_size * square.get_x()),
+            offset.y + (square_size * square.get_y()));
+        DrawRectangle(square.screen_position.x, square.screen_position.y,
+            square_size, square_size, square.obstacle ? BLACK : std::fmod(square.get_x() + mod_y, 2) == 0 ? GRAY : WHITE);
+
+        square.screen_position = Vector2AddValue(square.screen_position, square_size * 0.5f);
     }
-    
-    DrawText("Start", 
-        offset.x + (square_size_ * start_.get_x()), 
-        offset.y + (square_size_ * start_.get_y()), 
+
+    const LabyrinthSquare& start = start_square();
+    const LabyrinthSquare& exit  = exit_square();
+
+    DrawText("Start",
+        offset.x + (square_size * start.get_x()),
+        offset.y + (square_size * start.get_y()),
         30, BLACK);
-    DrawText("End", 
-        offset.x + (square_size_ * exit_.get_x()), 
-        offset.y + (square_size_ * exit_.get_y()), 
+    DrawText("End",
+        offset.x + (square_size * exit.get_x()),
+        offset.y + (square_size * exit.get_y()),
         30, BLACK);
 }
 
@@ -68,34 +74,38 @@ void LabyrinthGrid::create_labyrinth(bool add_noise)
     for (auto& square : squares_)
         square.obstacle = !add_noise || GetRandomValue(0, 1) == 1;
 
-    const int start_index = GetRandomValue(0, count - 1);
-    int end_index = start_index;
-    while (end_index == start_index)
-        end_index = GetRandomValue(0, count - 1);
+    start_index_ = GetRandomValue(0, count - 1);
+    exit_index_ = start_index_;
+    while (exit_index_ == start_index_)
+        exit_index_ = GetRandomValue(0, count - 1);
 
-    start_ = squares_[start_index];
-    exit_ = squares_[end_index];
+    const LabyrinthSquare& exit = exit_square();
 
     std::vector<LabyrinthSquare> critical_path;
     std::optional<LabyrinthSquare> previous;
-    LabyrinthSquare current = squares_[start_index];
+    LabyrinthSquare current = squares_[start_index_];
 
-    squares_[start_index].obstacle = false;
+    squares_[start_index_].obstacle = false;
     critical_path.push_back(current);
 
-    while (current != exit_)
+    while (current != exit)
     {
         LabyrinthSquare next = current;
 
         // Dead end: allow stepping back to the previous square
-        if (!get_weighted_next_square(current, previous ? &*previous : nullptr, exit_, next))
-            get_weighted_next_square(current, nullptr, exit_, next);
+        if (!get_weighted_next_square(current, previous ? &*previous : nullptr, exit, next))
+            get_weighted_next_square(current, nullptr, exit, next);
 
         previous = current;
         current = next;
         squares_[to_index(current)].obstacle = false;
         critical_path.push_back(current);
     }
+}
+
+float LabyrinthGrid::distance_to_exit(LabyrinthSquare from) const
+{
+    return Vector2DistanceSqr(from.get_coordinate(), exit_square().get_coordinate());
 }
 
 bool LabyrinthGrid::is_valid_coordinate(const Vector2 coordinate) const
@@ -154,7 +164,6 @@ bool LabyrinthGrid::get_weighted_next_square(const LabyrinthSquare& current,
     result = *pool[GetRandomValue(0, static_cast<int>(pool.size()) - 1)];
     return true;
 }
-
 
 int LabyrinthGrid::to_index(const LabyrinthSquare& square) const
 {

@@ -41,3 +41,8 @@ float LabyrinthSquare::get_y() const
 {
     return coordinate_.y;
 }
+
+Vector2 LabyrinthSquare::get_coordinate() const
+{
+    return coordinate_;
+}

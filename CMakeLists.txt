@@ -21,6 +21,8 @@ add_executable(Laberinth
         src/LabyrinthGrid.cpp
         src/LabyrinthSquare.h
         src/LabyrinthSquare.cpp
+        src/Character.h
+        src/Character.cpp
 )
 
 target_link_libraries(Laberinth PRIVATE raylib)
